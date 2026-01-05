@@ -7,9 +7,9 @@ from imageOperations import patchMaker
 
 
 # Indlæs billeder i henholdsvis BGR, gråtone og HSV 
-bgr = cv2.imread("../images/shapes.jpg", cv2.IMREAD_COLOR)
-gray = cv2.imread("../images/pills.jpg", cv2.IMREAD_GRAYSCALE)
-bgr2 = cv2.imread("../images/foggy_forest.jpg")
+bgr = cv2.imread("../images/balls.jpg", cv2.IMREAD_COLOR)
+gray = cv2.imread("../images/balls.jpg", cv2.IMREAD_GRAYSCALE)
+bgr2 = cv2.imread("../images/balls.jpg")
 hsv = cv2.cvtColor(bgr2, cv2.COLOR_BGR2HSV)
 
 # Vis billeders opløsning
