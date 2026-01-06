@@ -40,6 +40,8 @@
 # debug information files
 *.dwo
 *.jpg
+*.png
+*.jpeg
 
 # ML models
 *.tar.gz
