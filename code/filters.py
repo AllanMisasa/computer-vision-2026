@@ -2,18 +2,23 @@ import cv2
 import numpy as np 
 from matplotlib import pyplot as plt 
 
-gray = cv2.imread("../images/pills.jpg", 0)
-bgr = cv2.imread("../images/zebra.jpg")
+gray = cv2.imread("../images/IMG_0333.jpeg", 0)
+bgr = cv2.imread("../images/IMG_0333.jpeg")
 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
-
 gauss = cv2.GaussianBlur(bgr, (11, 11), 0)
 bilat = cv2.bilateralFilter(gray, 5, sigmaColor=75, sigmaSpace=75)
+
+gray = cv2.resize(gray, (512, 768))
+bgr = cv2.resize(bgr, (512, 768))
+hsv = cv2.resize(hsv, (512, 768))
+gauss = cv2.resize(gauss, (512, 768))  
+bilat = cv2.resize(bilat, (512, 768))
 
 
 def compareEdges(filteredImg):
     sobelx = cv2.Sobel(src=filteredImg, ddepth=cv2.CV_64F, dx=1, dy=0, ksize=5)
     sobely = cv2.Sobel(src=filteredImg, ddepth=cv2.CV_64F, dx=0, dy=1, ksize=5)
-    sobelxy = cv2.Sobel(src=filteredImg, ddepth=cv2.CV_64F, dx=1, dy=0, ksize=5)
+    sobelxy = cv2.Sobel(src=filteredImg, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=5)
     canny = cv2.Canny(image=filteredImg, threshold1=100, threshold2=200)
     laplacian = cv2.convertScaleAbs(cv2.Laplacian(filteredImg, cv2.CV_64F))
 
@@ -99,8 +104,8 @@ def showComparison():
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-compareThresholds(bilat)
+#compareThresholds(bilat)
 #blobDetection(gray)
 #compareEdges(bilat)
 #hueEdges(hsv)
-#contourDetection(gray)
+contourDetection(gray)

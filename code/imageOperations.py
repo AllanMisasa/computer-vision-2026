@@ -49,7 +49,7 @@ def patchMaker(img, xPatches=3, yPatches=3):
                 cv2.imwrite('saved_patches/'+'tile'+str(x)+'_'+str(y)+'.jpg', tiles)
                 cv2.rectangle(img, (x, y), (x1, y1), (0, 255, 0), 1)
     cv2.imshow("Patched Image",img)
-    cv2.imwrite("../images/fruit-bowl.jpg",img)
+    cv2.imwrite("../images/IMG_0334.jpeg",img)
   
     cv2.waitKey()
     cv2.destroyAllWindows()

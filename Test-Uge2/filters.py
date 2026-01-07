@@ -2,9 +2,11 @@ import cv2
 import numpy as np 
 from matplotlib import pyplot as plt 
 
-gray = cv2.imread("../images/pills.jpg", 0)
-bgr = cv2.imread("../images/zebra.jpg")
+gray = cv2.imread("./IMG_0333.jpeg", 0)
+bgr = cv2.imread("./IMG_0333.jpeg")
 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
+gray = cv2.resize(gray, (400, 600))
+bgr = cv2.resize(bgr, (400, 600))
 
 gauss = cv2.GaussianBlur(bgr, (11, 11), 0)
 bilat = cv2.bilateralFilter(gray, 5, sigmaColor=75, sigmaSpace=75)
@@ -17,6 +19,7 @@ def compareEdges(filteredImg):
     canny = cv2.Canny(image=filteredImg, threshold1=100, threshold2=200)
     laplacian = cv2.convertScaleAbs(cv2.Laplacian(filteredImg, cv2.CV_64F))
 
+
     cv2.imshow("Sobel X", sobelx)
     cv2.imshow("Sobel Y", sobely)
     cv2.imshow("Sobel XY", sobelxy)
@@ -27,9 +30,9 @@ def compareEdges(filteredImg):
 
 
 def compareThresholds(blurred_grayimg):
-    th1 = cv2.adaptiveThreshold(blurred_grayimg, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-    th2 = cv2.adaptiveThreshold(blurred_grayimg, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    _, th3 = cv2.threshold(blurred_grayimg, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)    
+    th1 = cv2.adaptiveThreshold(blurred_grayimg, 150, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+    th2 = cv2.adaptiveThreshold(blurred_grayimg, 150, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    _, th3 = cv2.threshold(blurred_grayimg, 100, 200, cv2.THRESH_BINARY+cv2.THRESH_OTSU)    
     titles = ["Original", "Otsu", "Adaptive", "Gaussian"]
     images = [blurred_grayimg, th1, th2, th3]
 
@@ -100,7 +103,7 @@ def showComparison():
     cv2.destroyAllWindows()
 
 compareThresholds(bilat)
-#blobDetection(gray)
+blobDetection(gray)
 #compareEdges(bilat)
 #hueEdges(hsv)
 #contourDetection(gray)

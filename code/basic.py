@@ -7,15 +7,14 @@ from imageOperations import patchMaker
 
 
 # Indlæs billeder i henholdsvis BGR, gråtone og HSV 
-bgr = cv2.imread("../images/balls.jpg", cv2.IMREAD_COLOR)
-gray = cv2.imread("../images/balls.jpg", cv2.IMREAD_GRAYSCALE)
-bgr2 = cv2.imread("../images/balls.jpg")
+bgr = cv2.imread("../images/IMG_0334.jpeg", cv2.IMREAD_GRAYSCALE)
+bgr2 = cv2.imread("../images/IMG_0334.jpeg", cv2.IMREAD_COLOR)
 hsv = cv2.cvtColor(bgr2, cv2.COLOR_BGR2HSV)
 
 # Vis billeders opløsning
 print(bgr.shape)
-print(gray.shape)
-
+print(bgr2.shape)
+print(hsv.shape)
 # Nedskalering til anden opløsning
 downscaleResolution = (300, 200)
 downScaled = cv2.resize(gray, downscaleResolution, interpolation=cv2.INTER_LINEAR)

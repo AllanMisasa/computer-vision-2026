@@ -16,7 +16,8 @@ def main(argv):
     cv.namedWindow(window_name, cv.WINDOW_AUTOSIZE)
 
     # Load the source image
-    imageName = argv[0] if len(argv) > 0 else 'balls.jpg'
+    imageName = argv[0] if len(argv) > 0 else 'IMG_0334.jpeg'
+    imageName = cv.resize(imageName, 400, 400)
 
     global src
     src = cv.imread(cv.samples.findFile(imageName))

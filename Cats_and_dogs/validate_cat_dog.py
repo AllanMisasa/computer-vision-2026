@@ -53,7 +53,7 @@ transform = transforms.Compose([
 # --------------------
 # Load image
 # --------------------
-image_path = "dog.96.jpg"  # ← dit billede
+image_path = "IMG_0334.jpeg"  # ← dit billede
 image = Image.open(image_path).convert("RGB")
 image = transform(image).unsqueeze(0).to(device)
 
