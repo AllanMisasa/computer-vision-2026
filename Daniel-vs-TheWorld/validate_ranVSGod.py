@@ -53,7 +53,7 @@ transform = transforms.Compose([
 # --------------------
 # Load multiple images
 # --------------------
-IMAGE_DIR = r"C:\Users\DSkov\GitHub\computer-vision-2026\Daniel-vs-TheWorld\images"  # mappe med billeder
+IMAGE_DIR = r"C:\Users\DSkov\OneDrive\Studie\Programmering\GitHub\computer-vision-2026\Daniel-vs-TheWorld\Billeder"  # mappe med billeder
 images = []
 filenames = []
 
