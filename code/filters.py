@@ -2,18 +2,15 @@ import cv2
 import numpy as np 
 from matplotlib import pyplot as plt 
 
-gray = cv2.imread("../images/IMG_0333.jpeg", 0)
-bgr = cv2.imread("../images/IMG_0333.jpeg")
+
+gray = cv2.imread("../images/balls.jpg", cv2.IMREAD_GRAYSCALE)
+bgr = cv2.imread("../images/balls.jpg")
 hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
-gauss = cv2.GaussianBlur(bgr, (11, 11), 0)
+
+gauss = cv2.GaussianBlur(gray, (11, 11), 0)
 bilat = cv2.bilateralFilter(gray, 5, sigmaColor=75, sigmaSpace=75)
 
-gray = cv2.resize(gray, (512, 768))
-bgr = cv2.resize(bgr, (512, 768))
-hsv = cv2.resize(hsv, (512, 768))
-gauss = cv2.resize(gauss, (512, 768))  
-bilat = cv2.resize(bilat, (512, 768))
-
+#_, th3 = cv2.threshold(gray, 125, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)    
 
 def compareEdges(filteredImg):
     sobelx = cv2.Sobel(src=filteredImg, ddepth=cv2.CV_64F, dx=1, dy=0, ksize=5)
@@ -22,20 +19,21 @@ def compareEdges(filteredImg):
     canny = cv2.Canny(image=filteredImg, threshold1=100, threshold2=200)
     laplacian = cv2.convertScaleAbs(cv2.Laplacian(filteredImg, cv2.CV_64F))
 
-    cv2.imshow("Sobel X", sobelx)
-    cv2.imshow("Sobel Y", sobely)
-    cv2.imshow("Sobel XY", sobelxy)
-    cv2.imshow("Laplace", laplacian)
-    cv2.imshow("Canny", canny)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    titles = ["Original", "Sobel", "Canny", "Laplace"]
+    images = [filteredImg, sobelxy, canny, laplacian]
+    
+    for i in range(len(images)):
+        plt.subplot(2,2,i+1), plt.imshow(images[i], "gray")
+        plt.title(titles[i])
+        plt.xticks([]), plt.yticks([])
+    plt.show()
 
 
 def compareThresholds(blurred_grayimg):
-    th1 = cv2.adaptiveThreshold(blurred_grayimg, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-    th2 = cv2.adaptiveThreshold(blurred_grayimg, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    _, th3 = cv2.threshold(blurred_grayimg, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)    
-    titles = ["Original", "Otsu", "Adaptive", "Gaussian"]
+    th1 = cv2.adaptiveThreshold(blurred_grayimg, 150, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+    th2 = cv2.adaptiveThreshold(blurred_grayimg, 150, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    _, th3 = cv2.threshold(blurred_grayimg, 100, 200, cv2.THRESH_BINARY+cv2.THRESH_OTSU)    
+    titles = ["Original", "Gaussian", "Adaptive", "Otsu"]
     images = [blurred_grayimg, th1, th2, th3]
 
     for i in range(len(images)):
@@ -65,9 +63,11 @@ def hueEdges(hsvimg):
 
 
 def contourDetection(grayimg):
-    grayimg = cv2.bilateralFilter(grayimg, 9, sigmaColor=75, sigmaSpace=75)
-    ret, thresh = cv2.threshold(grayimg, 100, 255, cv2.THRESH_BINARY)
+    #grayimg = cv2.bilateralFilter(grayimg, 9, sigmaColor=75, sigmaSpace=75)
+    grayimg = cv2.GaussianBlur(grayimg, (5, 5), 0)
+    ret, thresh = cv2.threshold(grayimg, 150, 255, cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+    print(len(contours))
     grayCopy = grayimg.copy()
     cv2.drawContours(grayCopy, contours, -1, (0,255,0), 2, cv2.LINE_AA)
     cv2.imshow("Contours", grayCopy)
@@ -77,24 +77,46 @@ def contourDetection(grayimg):
 
 def blobDetection(grayimg):
     parameters = cv2.SimpleBlobDetector_Params()
-    
+
+    # Thresholding
+    parameters.minThreshold = 10
+    parameters.maxThreshold = 220
+    parameters.thresholdStep = 10
+
+    # Area (justér hvis nødvendigt)
     parameters.filterByArea = True
-    parameters.minArea = 10 
-    parameters.filterByCircularity = True 
-    parameters.minCircularity = 0.1
+    parameters.minArea = 300
+    parameters.maxArea = 20000
+
+    # Circularity (cirkler)
+    parameters.filterByCircularity = True
+    parameters.minCircularity = 0.7
+
+    # Inertia (akseforhold → rundhed)
+    parameters.filterByInertia = True
+    parameters.minInertiaRatio = 0.5
+
+    # Convexity
+    parameters.filterByConvexity = True
+    parameters.minConvexity = 0.8
 
     detector = cv2.SimpleBlobDetector_create(parameters)
-
     keypoints = detector.detect(grayimg)
-    imageWithKeypoints = cv2.drawKeypoints(grayimg, 
-                                           keypoints, 
-                                           np.array([]), 
-                                           (0,0,255), 
-                                           cv2.DrawMatchesFlags_DRAW_RICH_KEYPOINTS
-                                           )
+
+    print("Blobs fundet:", len(keypoints))
+
+    imageWithKeypoints = cv2.drawKeypoints(
+        grayimg,
+        keypoints,
+        None,
+        (0, 0, 255),
+        cv2.DrawMatchesFlags_DRAW_RICH_KEYPOINTS
+    )
+
     cv2.imshow("Blobs", imageWithKeypoints)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 
 
 def showComparison():
@@ -105,7 +127,7 @@ def showComparison():
     cv2.destroyAllWindows()
 
 #compareThresholds(bilat)
-#blobDetection(gray)
-#compareEdges(bilat)
+blobDetection(gray)
+#compareEdges(gauss)
 #hueEdges(hsv)
-contourDetection(gray)
+#contourDetection(gray)
