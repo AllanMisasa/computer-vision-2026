@@ -8,6 +8,17 @@ from torch.optim.lr_scheduler import StepLR
 
 
 class Net(nn.Module):
+    '''
+    Her definerer vi selve arkitekturen af modellen.
+    Hver convolution (conv1+2) er "feature extraction", altså hvor vi tager forskellige størrelser patches
+    fra billedet og lærer detaljer i forskellige størrelsesordener.
+    Bagefter går de til de "fully connected" (fc1+2) lag hvor den egentligt lærer sammenhængen mellem features og derfor at klassificere billederne. 
+    Dropout layers er hvor nogle features bliver fjernet hvis de ikke er vigtige.
+    Her i init metoden er det kun hvilke lag der eksisterer i modellen der er defineret. 
+    Hvordan de bliver brugt til læring er defineret i næste metode, forward.
+    I kan se en illustration af et lignende netværk med næsten samme struktur her: https://cdn.analyticsvidhya.com/wp-content/uploads/2021/06/63838cnntoday-67adc1fbd1a4a.webp
+    Samt en liste over mulige lag på PyTorch's dokumentation: https://docs.pytorch.org/docs/stable/nn.html
+    '''
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, 1)
@@ -17,6 +28,12 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(9216, 128)
         self.fc2 = nn.Linear(128, 10)
 
+
+    '''
+    Her beskriver vi i hvilken rækkeføle at modellen skal lære på de definerede lag.
+    Anvendelsen af lagene og rækkefølgen. Se billedet linket til ovenover for visualisering af lagene.
+    Det her er en meget almindelig arkitektur for en basismodel.
+    '''    
     def forward(self, x):
         x = self.conv1(x)
         x = F.relu(x)
@@ -72,20 +89,50 @@ def test(model, device, test_loader):
 def main():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
+    '''
+    Hvor mange inputs vi træner netværket på ad gangen.
+    Kan træne hurtigere med færre ad gangen, og kræver lavere hukkommelse.
+    Præcision kan ligeledes falde. Hvis det er alt for lavt kan det neurale net ikke lære.
+    Det er en kunst at sætte det rigtigt nogle gange!
+    '''
     parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                         help='input batch size for training (default: 64)')
+    '''
+    Når vi tester netværket behøver vi ikke tænke på batch size så meget, da nettet ikke lærer på det.
+    Derfor sætter vi det typisk bare så højt som vores RAM/VRAM kan klare.
+    '''
     parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                         help='input batch size for testing (default: 1000)')
+    '''
+    En epoch er en runde træning på ALLE billeder i træningssættet.
+    Derfor indstiller vi her hvor mange gange vi skal træne på hele sættet.
+    Også en kunst at sætte, da nettet på et tidspunkt ikke kan lære mere ud af dataen.
+    '''
     parser.add_argument('--epochs', type=int, default=14, metavar='N',
                         help='number of epochs to train (default: 14)')
+    '''
+    En CNN (og mange andre neurale netværk) lærer på data ved at respondere på et "tab" defineret fra en loss function.
+    Dette er måske det vigtigste parameter, da det påvirker læring markant ved bare små justeringer.
+    Sæt den for lavt, og træningsprocessen går hurtigt i stå uden at komme videre selv efter mange epochs.
+    Sæt den for højt og hver epoch give ustabile resultater da nettet lader sig påvirke for meget af små forskelle.
+    I værste fald kan en forhøjet learning rate gøre klassificeringen nærmest random igen efter flere epochs,
+    et fænomen vi kalder "exploding gradient".
+    '''
     parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
                         help='learning rate (default: 1.0)')
+    '''
+    Learning rate decay. Learning rate bliver lavere med denne faktor efter et antal epochs.
+    '''
     parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
+    '''
+    Kun relevant hvis der bliver brugt acceleration, altså et grafikkort, TPU eller NPU
+    '''
     parser.add_argument('--no-accel', action='store_true',
                         help='disables accelerator')
     parser.add_argument('--dry-run', action='store_true',
                         help='quickly check a single pass')
+    # Random seed for 
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
