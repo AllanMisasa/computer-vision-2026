@@ -42,3 +42,8 @@
 
 *.venv
 temp
+Cats_and_dogs/cat.3189.jpg
+*.jpg
+*.png
+*.jpeg
+Test-Uge1/data/cifar-10-python.tar.gz
