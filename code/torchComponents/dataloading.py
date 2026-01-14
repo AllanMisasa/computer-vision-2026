@@ -19,6 +19,7 @@ testDir = "../../images/pss/test/"
 transform = transforms.Compose([
             transforms.Resize(size=(64,64)),
             transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomVerticalFlip(p=0.2),        
             transforms.ToTensor()
             ])
 
